@@ -15,13 +15,15 @@ import pickle
 #}]
 
 # In[]:
-with open('res1.pkl', 'rb') as f:
+folder = 'results/1/'
+
+with open(folder + 'res1.pkl', 'rb') as f:
     results = pickle.load(f)
 
 # In[]:
 res_list = []
 
-thresh = 0.5
+thresh = 0.25
 
 for i, res in enumerate(results):
     persons = res[0]
@@ -51,7 +53,7 @@ for i, res in enumerate(results):
                              })
 
 # In[]:
-with open('dt.json', 'w') as outfile:
+with open(folder + 'dt.json', 'w') as outfile:
     json.dump(res_list, outfile)
 
 # In[]:
