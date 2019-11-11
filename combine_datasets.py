@@ -8,7 +8,8 @@ import json
 import matplotlib.pyplot as plt
 
 # In[]: MIPT DATASET
-folder_mipt = '/home/kenny/dgx/home/datasets/ir/mipt/'
+#folder_mipt = '/home/kenny/dgx/home/datasets/ir/mipt/'
+folder_mipt = '/home/datasets/ir/mipt/'
 
 # In[]:
 with open(folder_mipt + 'train.json') as json_file:
@@ -25,7 +26,8 @@ for img in images_mipt:
 images_count = len(images_mipt)
 
 # In[]: FLIR DATASET
-folders_flir = ['/home/kenny/dgx/home/datasets/ir/flir/train/', '/home/kenny/dgx/home/datasets/ir/flir/val/', '/home/kenny/dgx/home/datasets/ir/flir/video/']
+#folders_flir = ['/home/kenny/dgx/home/datasets/ir/flir/train/', '/home/kenny/dgx/home/datasets/ir/flir/val/', '/home/kenny/dgx/home/datasets/ir/flir/video/']
+folders_flir = ['/home/datasets/ir/flir/train/', '/home/datasets/ir/flir/val/', '/home/datasets/ir/flir/video/']
 
 # In[]:
 for folder_flir in folders_flir:
@@ -72,6 +74,9 @@ train_data_global = {'annotations': annotations_global,
                     'images': images_global,
                     'info': train_data['info'],
                     'licenses': train_data['licenses']}
+
+with open('train_data_global.json', 'w') as outfile:
+    json.dump(train_data_global, outfile)
 
 # In[]: Visualize
 for ann in annotations_global:
