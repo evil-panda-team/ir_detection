@@ -9,21 +9,15 @@ import matplotlib.pyplot as plt
 import pickle
 
 # In[]:
+folder = 'results/combined/'
 
-#[{
-#"image_id" : int, "category_id" : int, "bbox" : [x,y,width,height], "score" : float,
-#}]
-
-# In[]:
-folder = 'results/1/'
-
-with open(folder + 'res1.pkl', 'rb') as f:
+with open(folder + 'res_combined.pkl', 'rb') as f:
     results = pickle.load(f)
 
 # In[]:
 res_list = []
 
-thresh = 0.25
+thresh = 0.0001
 
 for i, res in enumerate(results):
     persons = res[0]
@@ -34,10 +28,8 @@ for i, res in enumerate(results):
         if s > thresh:
             res_list.append({"image_id" : i, 
                              "category_id" : 1, 
-#                             "bbox" : [round(x, 1), round(y, 1), round(w, 1), round(h, 1)], 
-#                             "score" : round(s, 1)
                              "bbox" : [float(x), float(y), float(w), float(h)], 
-                             "score" : float(s)
+                             "score" : float(1)
                              })
         
     cars = res[1]
@@ -49,7 +41,7 @@ for i, res in enumerate(results):
             res_list.append({"image_id" : i, 
                              "category_id" : 2, 
                              "bbox" : [float(x), float(y), float(w), float(h)], 
-                             "score" : float(s)
+                             "score" : float(1)
                              })
 
 # In[]:
