@@ -29,7 +29,7 @@ for i, res in enumerate(results):
             res_list.append({"image_id" : i, 
                              "category_id" : 1, 
                              "bbox" : [float(x), float(y), float(w), float(h)], 
-                             "score" : float(1)
+                             "score" : float(0)
                              })
         
     cars = res[1]
@@ -41,7 +41,7 @@ for i, res in enumerate(results):
             res_list.append({"image_id" : i, 
                              "category_id" : 2, 
                              "bbox" : [float(x), float(y), float(w), float(h)], 
-                             "score" : float(1)
+                             "score" : float(0)
                              })
 
 # In[]:
