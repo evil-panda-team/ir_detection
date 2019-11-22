@@ -16,7 +16,7 @@ model = init_detector(config_file, checkpoint_file, device='cuda:0')
 
 show_res = True
 predictions = []
-threshold = 0.1
+threshold = 0.001
 
 with open(mipt_json_file, "r") as mipt_read_file:
     mipt_data = json.load(mipt_read_file) 
@@ -56,7 +56,7 @@ with open(mipt_json_file, "r") as mipt_read_file:
                 predictions.append(pred)
 
         if show_res:
-            show_result(file_path, result, model.CLASSES, show=False, out_file='results/' + img['file_name'])
+            show_result(file_path, result, model.CLASSES, show=False, out_file='result_images/' + img['file_name'])
 
 
 with open("dt.json", "w") as write_file:
