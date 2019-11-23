@@ -208,8 +208,8 @@ data = dict(
     workers_per_gpu=2,
     train=dict(
         type=dataset_type,
-        ann_file='/home/rauf/ir/train_merged_mipt_flir.json',
-        img_prefix=data_root + 'merged/',
+        ann_file='/home/rauf/ir_detection/train_merged_mipt_flir_tokyo_normilized.json',
+        img_prefix=data_root + 'merged_preprocessed/',
         pipeline=train_pipeline),
     val=dict(
         type=dataset_type,
@@ -237,14 +237,14 @@ log_config = dict(
     interval=50,
     hooks=[
         dict(type='TextLoggerHook'),
-        # dict(type='TensorboardLoggerHook')
+        dict(type='TensorboardLoggerHook')
     ])
 # yapf:enable
 # runtime settings
-total_epochs = 20
+total_epochs = 60
 dist_params = dict(backend='nccl')
 log_level = 'INFO'
-work_dir = '/home/rauf/ir/work_dir/cascade_rcnn_hrnetv2p_w32'
+work_dir = '/home/rauf/ir_detection/work_dir/cascade_rcnn_hrnetv2p_w32'
 load_from = None
 resume_from = None
 workflow = [('train', 1)]
