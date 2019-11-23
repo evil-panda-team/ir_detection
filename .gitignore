@@ -1,0 +1,7 @@
+vis/
+work_dir/
+mmdetection/
+*.zip
+.ipynb_checkpoints/
+result_images/
+*__pycache__*
