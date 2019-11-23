@@ -8,7 +8,7 @@ from tqdm import tqdm
 # In[]]:
 folder = '/home/kenny/dgx/home/datasets/ir/'
 
-with open(folder + 'train_data_3ds.json') as json_file:
+with open(folder + 'train_data_pedestrians.json') as json_file:
     train_data = json.load(json_file)
     annotations = train_data['annotations']
     categories = train_data['categories']
@@ -19,7 +19,7 @@ with open(folder + 'train_data_3ds.json') as json_file:
 # In[]:
 for ann in annotations:
     
-    ann = annotations[66666]
+    ann = annotations[-5000]
     img = cv2.imread('/home/kenny/dgx'+ images[ann['image_id']]['file_name'], 0)
     bbox = ann['bbox']
     cv2.rectangle(img, (int(bbox[0]), int(bbox[1])), (int(bbox[0]+bbox[2]), int(bbox[1]+bbox[3])), (255, 0, 0), 2)
@@ -52,11 +52,11 @@ train_data_global = {'annotations': annotations,
                     'info': info,
                     'licenses': licenses}
 
-with open('train_data_3ds_a.json', 'w') as outfile:
+with open('train_data_pedestrians_a.json', 'w') as outfile:
     json.dump(train_data_global, outfile)
 
 # In[]]:
-
+annotations = annotations[:-2]
 
 
 

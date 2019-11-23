@@ -4,6 +4,8 @@ import cv2
 from glob import glob
 from tqdm import tqdm
 import json
+import scipy.io
+import numpy as np
 import matplotlib.pyplot as plt
 
 # In[]: MIPT DATASET
@@ -17,8 +19,16 @@ with open(folder_mipt + 'train.json') as json_file:
     categories_mipt = train_data['categories']
     images_mipt = train_data['images']
         
-# In[]:
-for ann in annotations_mipt:
+categories_mipt = categories_mipt[:1]
+
+# In[]:        
+objects_count = 0
+for i, ann in enumerate(annotations_mipt):
+    if ann['category_id'] > 3 or ann['category_id'] == 2:
+        annotations_mipt[i] = None
+        continue
+    objects_count += 1
+    ann['id'] = objects_count
     ann['bbox'] = list(map(int, ann['bbox']))
     x, y, w, h = ann['bbox']
     ann['segmentation'] = [[x, y, x, y+h, x+w, y+h, x+w, y]]
@@ -27,7 +37,7 @@ for img in images_mipt:
     img['file_name'] = folder_mipt + 'images/' + img['name']
     del(img['name'])
     
-objects_count = len(annotations_mipt)
+annotations_mipt = [i for i in annotations_mipt if i]
 images_count = len(images_mipt)
 
 #train_data_mipt = {'annotations': annotations_mipt,
@@ -71,11 +81,9 @@ for folder_flir in folders_flir:
         images_flir = train_data['images']
 
     for i, ann in enumerate(annotations_flir):
-        if ann['category_id'] > 3 or ann['category_id'] == 2:
+        if ann['category_id'] >= 2:
             annotations_flir[i] = None
             continue
-        elif ann['category_id'] == 3:
-            ann['category_id'] = 2
         objects_count += 1
         ann['id'] = objects_count
         ann['image_id'] = ann['image_id'] + images_count
@@ -162,7 +170,7 @@ for folder_tokyo in folders_tokyo:
         with open(file) as f:
             for line in f:
                 cl, x, y, w, h = line[:-1].split(" ")
-                if int(cl) < 2:
+                if int(cl) < 1:
                     objects_count += 1
                     w = float(w)*width
                     h = float(h)*height
@@ -209,6 +217,42 @@ for folder_tokyo in folders_tokyo:
 #    json.dump(train_data_global, outfile)
 
 # In[]:
+#folder_pedestrian = '/home/kenny/dgx/home/datasets/ir/Pedestrian/'
+folder_pedestrian = '/home/datasets/ir/Pedestrian/'
+        
+# In[]:
+mat = scipy.io.loadmat(folder_pedestrian + 'GNT.mat')
+GNT = mat['GNT']
+        
+# In[]:
+annotations_pedestrian = []
+images_pedestrian = []
+
+for i, gnt in enumerate(GNT):
+    for gn in gnt:
+        for g in gn:
+            objects_count += 1
+            x, y, w, h, frame_id, pedestrian_id = g.astype(int)
+            annotation = {'area': int(w*h),
+                          'bbox': [int(x), int(y), int(w), int(h)],
+                          'category_id': 1,
+                          'id': objects_count,
+                          'image_id': int(frame_id + images_count - 1),
+                          'iscrowd': 0,
+                          'segmentation': [[int(x), int(y), int(x), int(y + h), int(x + w), int(y + h), int(x + w), int(y)]] 
+                          }
+            annotations_pedestrian.append(annotation)
+    
+    for idx in range(len(gn)//pedestrian_id):
+        image = {'file_name': folder_pedestrian + 'Data/seq{}/thermal/thermal_{:07d}.jpg'.format(i+1, idx+1),
+                 'height': 480,
+                 'id': images_count,
+                 'width': 640,
+        }
+        images_pedestrian.append(image)
+        images_count += 1
+         
+# In[]:
 annotations_global = annotations_mipt + annotations_flir_train + annotations_flir_val + annotations_flir_video + annotations_tokyo_fir + annotations_tokyo_mir + annotations_tokyo_nir
 images_global = images_mipt + images_flir_train + images_flir_val + images_flir_video + images_tokyo_fir + images_tokyo_mir + images_tokyo_nir
 categories_global = categories_mipt
@@ -222,5 +266,5 @@ train_data_global = {'annotations': annotations_global,
                     'info': train_data['info'],
                     'licenses': train_data['licenses']}
 
-with open('train_data_3ds.json', 'w') as outfile:
+with open('train_data_pedestrians.json', 'w') as outfile:
     json.dump(train_data_global, outfile)
