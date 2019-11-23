@@ -46,25 +46,23 @@ images_count = len(images_mipt)
 #    json.dump(train_data_mipt, outfile)
     
 # In[]:
-#for ann in annotations_mipt:
+#i = 0
+#for ann in tqdm(annotations_mipt):
 #    
-#    ann = annotations_mipt[917]
+##    ann = annotations_mipt[0]
 #    img = cv2.imread(images_mipt[ann['image_id']]['file_name'], 0)
 #    bbox = ann['bbox']
 #    cv2.rectangle(img, (int(bbox[0]), int(bbox[1])), (int(bbox[0]+bbox[2]), int(bbox[1]+bbox[3])), (255, 0, 0), 2)
+#    cv2.putText(img, categories_mipt[ann['category_id']-1]['name'], (50,50), cv2.FONT_HERSHEY_SIMPLEX, 2, (255,255,255), 2, cv2.LINE_AA)
 #    plt.imshow(img, cmap='gray')
-#    print(categories_mipt[ann['category_id']-1]['name'])
-#    
-#    break
+#    cv2.imwrite("mipt_vis/{}.png".format(i) ,img)
+#    i += 1
 
 # In[]: FLIR DATASET
 #folders_flir = ['/home/kenny/dgx/home/datasets/ir/flir/train/', '/home/kenny/dgx/home/datasets/ir/flir/val/', '/home/kenny/dgx/home/datasets/ir/flir/video/']
 folders_flir = ['/home/datasets/ir/flir/train/', '/home/datasets/ir/flir/val/', '/home/datasets/ir/flir/video/']
 
 # In[]:
-#objects_count = 0
-#images_count = 0
-
 for folder_flir in folders_flir:
 
     with open(folder_flir + 'thermal_annotations.json') as json_file:
@@ -73,12 +71,14 @@ for folder_flir in folders_flir:
         images_flir = train_data['images']
 
     for i, ann in enumerate(annotations_flir):
-        ann['id'] = ann['id'] + objects_count
-        ann['image_id'] = ann['image_id'] + images_count
         if ann['category_id'] > 3 or ann['category_id'] == 2:
             annotations_flir[i] = None
+            continue
         elif ann['category_id'] == 3:
             ann['category_id'] = 2
+        objects_count += 1
+        ann['id'] = objects_count
+        ann['image_id'] = ann['image_id'] + images_count
             
     for img in images_flir:
         img['file_name'] = folder_flir + img['file_name']
@@ -88,15 +88,12 @@ for folder_flir in folders_flir:
             
     if 'train' in folder_flir:
         annotations_flir_train = [i for i in annotations_flir if i]
-        objects_count += len(annotations_flir_train)
         images_flir_train = images_flir
     elif 'val' in folder_flir:
         annotations_flir_val = [i for i in annotations_flir if i]
-        objects_count += len(annotations_flir_val)
         images_flir_val = images_flir
     elif 'video' in folder_flir:
         annotations_flir_video = [i for i in annotations_flir if i]
-        objects_count += len(annotations_flir_video)
         images_flir_video = images_flir
 
 # In[]:
@@ -161,12 +158,12 @@ for folder_tokyo in folders_tokyo:
     width = 640 if 'fir' in folder_tokyo else 320
     height = 480 if 'fir' in folder_tokyo else 256
     
-    obj = 0
     for ind, file in tqdm(enumerate(files)):
         with open(file) as f:
             for line in f:
                 cl, x, y, w, h = line[:-1].split(" ")
                 if int(cl) < 2:
+                    objects_count += 1
                     w = float(w)*width
                     h = float(h)*height
                     x = int(float(x)*width - w/2)
@@ -174,13 +171,12 @@ for folder_tokyo in folders_tokyo:
                     annotation = {'area': w*h,
                                   'bbox': [x, y, int(w), int(h)],
                                   'category_id': int(cl) + 1,
-                                  'id': obj + objects_count,
+                                  'id': objects_count,
                                   'image_id': ind + images_count,
                                   'iscrowd': 0,
-                                  'segmentation': [x, y, x, y + int(h), x + int(w), y + int(h), x + int(w), y] 
+                                  'segmentation': [[x, y, x, y + int(h), x + int(w), y + int(h), x + int(w), y]] 
                                   }
                     annotations_tokyo.append(annotation)
-                    obj += 1
             
         image = {'file_name': file.replace('labels', 'Images').replace('.txt', '.png'),
              'height': height,
@@ -190,7 +186,6 @@ for folder_tokyo in folders_tokyo:
         
         images_tokyo.append(image)
             
-    objects_count += len(annotations_tokyo)
     images_count += len(images_tokyo)
 
     if 'fir' in folder_tokyo:
@@ -227,5 +222,5 @@ train_data_global = {'annotations': annotations_global,
                     'info': train_data['info'],
                     'licenses': train_data['licenses']}
 
-with open('train_data_3ds_a.json', 'w') as outfile:
+with open('train_data_3ds.json', 'w') as outfile:
     json.dump(train_data_global, outfile)

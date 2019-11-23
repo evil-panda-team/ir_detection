@@ -3,11 +3,12 @@
 import cv2
 import json
 import matplotlib.pyplot as plt
+from tqdm import tqdm
 
 # In[]]:
 folder = '/home/kenny/dgx/home/datasets/ir/'
 
-with open(folder + 'train_data_3ds_extra1.json') as json_file:
+with open(folder + 'train_data_3ds.json') as json_file:
     train_data = json.load(json_file)
     annotations = train_data['annotations']
     categories = train_data['categories']
@@ -15,10 +16,10 @@ with open(folder + 'train_data_3ds_extra1.json') as json_file:
     info = train_data['info']
     licenses = train_data['licenses']
 
-# In[]]:
+# In[]:
 for ann in annotations:
     
-    ann = annotations[-5000]
+    ann = annotations[66666]
     img = cv2.imread('/home/kenny/dgx'+ images[ann['image_id']]['file_name'], 0)
     bbox = ann['bbox']
     cv2.rectangle(img, (int(bbox[0]), int(bbox[1])), (int(bbox[0]+bbox[2]), int(bbox[1]+bbox[3])), (255, 0, 0), 2)
@@ -29,7 +30,7 @@ for ann in annotations:
 # In[]: Analyze
 image_ids = []
 
-for ann in annotations:
+for ann in tqdm(annotations):
     image_id = ann['image_id']
     if image_id not in image_ids:
         image_ids.append(image_id)
@@ -40,8 +41,8 @@ image_extra['id'] = len(images)
 images.append(image_extra)
 
 ann_extra = annotations[0].copy()
-ann_extra['image_id'] = len(images)
-ann_extra['id'] = len(annotations)
+ann_extra['image_id'] = len(images)-1
+ann_extra['id'] = len(annotations)+1
 annotations.append(ann_extra)
 
 # In[]]:
@@ -51,7 +52,7 @@ train_data_global = {'annotations': annotations,
                     'info': info,
                     'licenses': licenses}
 
-with open('train_data_3ds_extra1.json', 'w') as outfile:
+with open('train_data_3ds_a.json', 'w') as outfile:
     json.dump(train_data_global, outfile)
 
 # In[]]:
